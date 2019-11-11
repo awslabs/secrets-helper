@@ -16,7 +16,7 @@ def read(*args):
 
 def get_release():
     """Read the release (full three-part version number) from this module."""
-    init = read("..", "src", "secrets_manager_helper", "identifiers.py")
+    init = read("..", "src", "secrets_helper", "identifiers.py")
     return VERSION_RE.search(init).group(1)
 
 

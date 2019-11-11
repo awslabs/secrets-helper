@@ -10,11 +10,7 @@
 # distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
-"""Placeholder module to remind you to write tests."""
-import pytest
+"""Load PyPI secrets from Secrets Manager into configured environment variables."""
+from .identifiers import __version__
 
-
-@pytest.mark.xfail(strict=True)
-@pytest.mark.examples
-def test_write_tests():
-    raise AssertionError()
+__all__ = ("__version__",)

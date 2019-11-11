@@ -1,0 +1,102 @@
+Description: "Create a CodeBuild project to deploy a Python project using secrets-helper and tox."
+Parameters:
+  GitHubUser:
+    Description: Name of GitHub user that owns the repository
+    Type: String
+  GitHubProject:
+    Description: Name of repository on GitHub
+    Type: String
+  SecretArn:
+    Description: ARN of AWS Secrets Manager secret containing your PyPI credentials
+    Type: String
+  KmsCmkArn:
+    Description: ARN of AWS KMS CMK that protects SecretArn
+    Type: String
+  ComputeType:
+    Description: CodeBuild compute type to use
+    Type: String
+    Default: BUILD_GENERAL1_SMALL
+    AllowedValues:
+      - BUILD_GENERAL1_SMALL
+      - BUILD_GENERAL1_MEDIUM
+      - BUILD_GENERAL1_LARGE
+Resources:
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: CodeBuildOperations
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGRoup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:*
+        - PolicyName: CodeBuildSecretsAccess
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                Resource:
+                  - !Ref KmsCmkArn
+                Condition:
+                  ForAnyValue:StringEquals:
+                    kms:EncryptionContext:SecretARN: !Ref SecretArn
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Ref SecretArn
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: NO_ARTIFACTS
+      BadgeEnabled: true
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+      ServiceRole: !GetAtt CodeBuildRole.Arn
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: !Ref ComputeType
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:1.0
+      Source:
+        Type: GITHUB
+        Location: !Sub https://github.com/${GitHubUser}/${GitHubProject}.git
+        BuildSpec: !Sub |
+          version: 0.2
+          phases:
+            install:
+              runtime-versions:
+                python: 3.7
+              commands:
+                - |
+                  if [[ -z "$PUBLISH_TAG" ]]; then
+                    echo "Must provide PUBLISH_VERSION in environment" 1>&2
+                    exit 1
+                  fi
+                - pip install -U pip
+                - pip install tox
+            pre_build:
+              commands:
+                - git checkout "$PUBLISH_TAG"
+            build:
+              commands:
+                # We export this here rather than in the env section because
+                # we want to override the $PUBLISH_TAG environment variable
+                # on execute.
+                - export SECRET_ARN="${SecretArn}"
+                - tox -e publish

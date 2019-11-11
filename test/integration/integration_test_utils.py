@@ -10,11 +10,20 @@
 # distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
-"""Placeholder module to remind you to write tests."""
-import pytest
+"""Helper utilities for integration tests."""
+import os
+
+SECRET_ID_VAR = "SECRETS_HELPER_TEST_SECRETS"
 
 
-@pytest.mark.xfail(strict=True)
-@pytest.mark.examples
-def test_write_tests():
-    raise AssertionError()
+def get_all_secret_ids():
+    raw_values = os.environ.get(SECRET_ID_VAR, "")
+    values = [v.strip() for v in raw_values.split(",")]
+
+    if not values:
+        raise EnvironmentError(
+            f'The "{SECRET_ID_VAR}" variable MUST be set to a comma-delimited list of secret IDs'
+            f" in order to run integration tests."
+        )
+
+    return values

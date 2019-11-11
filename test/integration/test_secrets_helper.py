@@ -10,11 +10,12 @@
 # distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
-"""Placeholder module to remind you to write tests."""
+"""Integration tests to ``secrets_helper`` CLI."""
 import pytest
+
+pytestmark = [pytest.mark.integ]
 
 
 @pytest.mark.xfail(strict=True)
-@pytest.mark.examples
-def test_write_tests():
-    raise AssertionError()
+def test_add_tests():
+    raise AssertionError("Add integration tests!")

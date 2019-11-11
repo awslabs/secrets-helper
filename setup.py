@@ -28,7 +28,7 @@ def read(*args):
 
 def get_version():
     """Read the version from this module."""
-    init = read("src", "secrets_manager_helper", "identifiers.py")
+    init = read("src", "secrets_helper", "identifiers.py")
     return VERSION_RE.search(init).group(1)
 
 
@@ -42,9 +42,11 @@ def get_requirements():
         req = req.strip()
         if not req:
             continue
-        elif req.startswith("#"):
+
+        if req.startswith("#"):
             continue
-        elif "+" in req:
+
+        if "+" in req:
             dependencies.append(req)
         else:
             requirements.append(req)
@@ -52,7 +54,7 @@ def get_requirements():
     return requirements, dependencies
 
 
-install_requires, dependency_links = get_requirements()
+INSTALL_REQUIRES, DEPENDENCY_LINKS = get_requirements()
 
 
 setup(
@@ -66,11 +68,13 @@ setup(
     maintainer="Amazon Web Services",
     description="secrets-helper",
     long_description=read("README.rst"),
-    keywords="secrets-helper secrets_manager_helper aws",
+    long_description_content_type="text/x-rst",
+    keywords="secrets-helper secrets_helper aws",
     data_files=["README.rst", "CHANGELOG.rst", "LICENSE", "requirements.txt"],
     license="Apache 2.0",
-    install_requires=install_requires,
-    dependency_links=dependency_links,
+    python_requires=">=3.7",
+    install_requires=INSTALL_REQUIRES,
+    dependency_links=DEPENDENCY_LINKS,
     classifiers=[
         "Development Status :: 1 - Planning",
         "Intended Audience :: Developers",
@@ -78,12 +82,11 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Security",
         "Topic :: Security :: Cryptography",
     ],
-    entry_points=dict(console_scripts=["secrets-helper=secrets_manager_helper._commands:cli"]),
+    entry_points=dict(console_scripts=["secrets-helper=secrets_helper._commands:cli"]),
 )
