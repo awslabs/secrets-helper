@@ -76,7 +76,7 @@ setup(
     install_requires=INSTALL_REQUIRES,
     dependency_links=DEPENDENCY_LINKS,
     classifiers=[
-        "Development Status :: 1 - Planning",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Natural Language :: English",
         "License :: OSI Approved :: Apache Software License",
