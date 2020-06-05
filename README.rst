@@ -28,6 +28,8 @@ secrets-helper
 with tools that accept credentials and other configuration
 through environment variables.
 
+`Security issue notifications`_
+
 ***************
 Getting Started
 ***************
@@ -305,3 +307,4 @@ and will pass our continous integration code formatting tests.
 .. _detox: https://pypi.org/project/detox/
 .. _tox-pyenv: https://pypi.org/project/tox-pyenv/
 .. _pyenv: https://github.com/pyenv/pyenv
+.. _Security issue notifications: https://github.com/aws/secrets-helper/tree/master/CONTRIBUTING.md#security-issue-notifications
